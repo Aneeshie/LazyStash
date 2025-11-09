@@ -31,6 +31,7 @@ import {
 import { Button } from "~/components/ui/button";
 import Image from "next/image";
 import { api } from "~/trpc/react";
+import UseRefetch from "~/hooks/use-refetch";
 
 const formSchema = z.object({
   projectName: z
@@ -43,6 +44,7 @@ const formSchema = z.object({
 
 export default function CreatePage() {
   const createProject = api.project.createProject.useMutation();
+  const refetch = UseRefetch();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -73,6 +75,7 @@ export default function CreatePage() {
     createProject.mutate(data, {
       onSuccess: () => {
         toast.success("Project created Successfully");
+        refetch();
       },
       onError: () => {
         toast.error("Failed to create project");
