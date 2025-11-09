@@ -23,6 +23,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "~/components/ui/sidebar";
+import UseProject from "~/hooks/use-project";
 import { cn } from "~/lib/utils";
 
 const items = [
@@ -48,15 +49,11 @@ const items = [
   },
 ];
 
-const projects = [
-  { name: "project 1" },
-  { name: "project 2" },
-  { name: "project 3" },
-];
-
 export function AppSidebar() {
   const pathname = usePathname();
   const { open } = useSidebar();
+
+  const { projects, selectedProjectId, setselectedProjectId } = UseProject();
 
   return (
     <Sidebar collapsible="icon" variant="floating">
@@ -80,7 +77,7 @@ export function AppSidebar() {
                       href={item.url}
                       className={cn(
                         pathname === item.url && "bg-primary text-white",
-                        "list-none"
+                        "list-none",
                       )}
                     >
                       <item.icon />
@@ -98,14 +95,37 @@ export function AppSidebar() {
           <SidebarGroupLabel>Your Projects</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {projects.map((project, idx) => (
-                <SidebarMenuItem key={idx}>
-                  <SidebarMenuButton>
-                    <div className="rounded-sm border size-6 flex items-center justify-center text-sm shrink-0">
-                      {project.name[0]!.toUpperCase()}
-                    </div>
+              {projects?.map((project) => (
+                <SidebarMenuItem key={project.id}>
+                  <SidebarMenuButton asChild>
+                    <button
+                      type="button"
+                      onClick={() => setselectedProjectId(project.id)}
+                      className={cn(
+                        "flex w-full items-center gap-3 rounded-sm px-2 py-1 text-sm",
+                        project.id === selectedProjectId &&
+                          "bg-primary text-white",
+                      )}
+                    >
+                      <div
+                        className={cn(
+                          "flex size-6 shrink-0 items-center justify-center rounded-sm border text-sm",
+                          project.id === selectedProjectId &&
+                            "bg-primary text-white",
+                        )}
+                      >
+                        {project.projectName[0]!.toUpperCase()}
+                      </div>
 
-                    {open && <span className="truncate">{project.name}</span>}
+                      <span
+                        className={cn(
+                          "truncate",
+                          project.id === selectedProjectId && "text-white",
+                        )}
+                      >
+                        {project.projectName}
+                      </span>
+                    </button>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
@@ -127,4 +147,3 @@ export function AppSidebar() {
     </Sidebar>
   );
 }
-
