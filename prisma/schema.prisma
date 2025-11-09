@@ -17,6 +17,22 @@ model User {
     email     String  @unique
     credit    Int     @default(120)
 
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+    createdAt DateTime  @default(now())
+    updatedAt DateTime  @updatedAt
+    projects  Project[]
+}
+
+model Project {
+    id          String @id @default(cuid())
+    projectName String
+    repoUrl     String
+
+    createdAt DateTime  @default(now())
+    updatedAt DateTime  @updatedAt
+    deletedAt DateTime?
+    userId    String
+
+    //relations 
+
+    user User @relation(fields: [userId], references: [id])
 }
