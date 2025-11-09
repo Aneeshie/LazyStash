@@ -30,6 +30,7 @@ import {
 } from "~/components/ui/input-group";
 import { Button } from "~/components/ui/button";
 import Image from "next/image";
+import { api } from "~/trpc/react";
 
 const formSchema = z.object({
   projectName: z
@@ -41,6 +42,8 @@ const formSchema = z.object({
 });
 
 export default function CreatePage() {
+  const createProject = api.project.createProject.useMutation();
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -52,19 +55,28 @@ export default function CreatePage() {
 
   function onSubmit(data: z.infer<typeof formSchema>) {
     // this is for testing later ill call actions...
-    toast("You submitted the following values:", {
-      description: (
-        <pre className="bg-code text-code-foreground mt-2 w-[320px] overflow-x-auto rounded-md p-4">
-          <code>{JSON.stringify(data, null, 2)}</code>
-        </pre>
-      ),
-      position: "bottom-right",
-      classNames: {
-        content: "flex flex-col gap-2",
+    // toast("You submitted the following values:", {
+    //   description: (
+    //     <pre className="bg-code text-code-foreground mt-2 w-[320px] overflow-x-auto rounded-md p-4">
+    //       <code>{JSON.stringify(data, null, 2)}</code>
+    //     </pre>
+    //   ),
+    //   position: "bottom-right",
+    //   classNames: {
+    //     content: "flex flex-col gap-2",
+    //   },
+    //   style: {
+    //     "--border-radius": "calc(var(--radius)  + 4px)",
+    //   } as React.CSSProperties,
+    // });
+
+    createProject.mutate(data, {
+      onSuccess: () => {
+        toast.success("Project created Successfully");
       },
-      style: {
-        "--border-radius": "calc(var(--radius)  + 4px)",
-      } as React.CSSProperties,
+      onError: () => {
+        toast.error("Failed to create project");
+      },
     });
   }
 
@@ -153,10 +165,15 @@ export default function CreatePage() {
               type="button"
               variant="outline"
               onClick={() => form.reset()}
+              disabled={createProject.isPending}
             >
               Reset
             </Button>
-            <Button type="submit" form="form-rhf-demo">
+            <Button
+              type="submit"
+              form="form-rhf-demo"
+              disabled={createProject.isPending}
+            >
               Submit
             </Button>
           </Field>
