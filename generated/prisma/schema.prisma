@@ -33,6 +33,7 @@ model Project {
 
   //relations 
   userProjects User_Project[]
+  commits      Commit[]
 }
 
 model User_Project {
@@ -48,4 +49,23 @@ model User_Project {
   project Project @relation(fields: [projectId], references: [id])
 
   @@unique([userId, projectId])
+}
+
+model Commit {
+  id String @id @default(cuid())
+
+  //relation
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id])
+
+  commitMessage      String
+  commitHash         String
+  commitAuthor       String
+  commitAuthorAvatar String
+  commitDate         DateTime
+
+  summary String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
